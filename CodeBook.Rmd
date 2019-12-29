@@ -1,8 +1,9 @@
+
 ---
 title: "CodeBook.md"
 author: "Sofia Riccomagno"
 date: "29/12/2019"
-output: html_document
+output: github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -108,3 +109,4 @@ This code book summarizes the resulting data fields in `tidy.txt`.
 * `SITTING` (value `4`): subject was sitting during the test
 * `STANDING` (value `5`): subject was standing during the test
 * `LAYING` (value `6`): subject was laying down during the test
+
