@@ -1,28 +1,14 @@
-##############################################################################
-#
-# FILE
-#   run_analysis.R
-#
-# OVERVIEW
-#   Using data collected from the accelerometers from the Samsung Galaxy S 
-#   smartphone, work with the data and make a clean data set, outputting the
-#   resulting tidy data to a file named "tidy_data.txt".
-#   See README.md for details.
-#
 
 library(dplyr)
 
-
-##############################################################################
-# STEP 0A - Get data
-##############################################################################
+# Get data
 
 # download zip file containing data if it hasn't already been downloaded
 zipUrl <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
 zipFile <- "UCI HAR Dataset.zip"
 
 if (!file.exists(zipFile)) {
-  download.file(zipUrl, zipFile, mode = "wb")
+  download.file(zipUrl, zipFile, mode = "curl")
 }
 
 # unzip zip file containing data if data directory doesn't already exist
@@ -31,10 +17,7 @@ if (!file.exists(dataPath)) {
   unzip(zipFile)
 }
 
-
-##############################################################################
-# STEP 0B - Read data
-##############################################################################
+# Read data
 
 # read training data
 trainingSubjects <- read.table(file.path(dataPath, "train", "subject_train.txt"))
@@ -56,17 +39,16 @@ activities <- read.table(file.path(dataPath, "activity_labels.txt"))
 colnames(activities) <- c("activityId", "activityLabel")
 
 
-##############################################################################
-# Step 1 - Merge the training and the test sets to create one data set
-##############################################################################
+# Merge the training and the test sets 
 
-# concatenate individual data tables to make single data table
+
+# make single data table
 humanActivity <- rbind(
   cbind(trainingSubjects, trainingValues, trainingActivity),
   cbind(testSubjects, testValues, testActivity)
 )
 
-# remove individual data tables to save memory
+# remove individual data tables 
 rm(trainingSubjects, trainingValues, trainingActivity, 
    testSubjects, testValues, testActivity)
 
@@ -74,31 +56,23 @@ rm(trainingSubjects, trainingValues, trainingActivity,
 colnames(humanActivity) <- c("subject", features[, 2], "activity")
 
 
-##############################################################################
-# Step 2 - Extract only the measurements on the mean and standard deviation
-#          for each measurement
-##############################################################################
+# Mean and standard deviation for each measurement
 
 # determine columns of data set to keep based on column name...
 columnsToKeep <- grepl("subject|activity|mean|std", colnames(humanActivity))
 
-# ... and keep data in these columns only
+# keep data in these columns only
 humanActivity <- humanActivity[, columnsToKeep]
 
 
-##############################################################################
-# Step 3 - Use descriptive activity names to name the activities in the data
-#          set
-##############################################################################
+#Name the activities in the dataset
 
 # replace activity values with named factor levels
 humanActivity$activity <- factor(humanActivity$activity, 
                                  levels = activities[, 1], labels = activities[, 2])
 
 
-##############################################################################
-# Step 4 - Appropriately label the data set with descriptive variable names
-##############################################################################
+#Descriptive variable names
 
 # get column names
 humanActivityCols <- colnames(humanActivity)
@@ -123,10 +97,7 @@ humanActivityCols <- gsub("BodyBody", "Body", humanActivityCols)
 colnames(humanActivity) <- humanActivityCols
 
 
-##############################################################################
-# Step 5 - Create a second, independent tidy set with the average of each
-#          variable for each activity and each subject
-##############################################################################
+#Create tidy dataset
 
 # group by subject and activity and summarise using mean
 humanActivityMeans <- humanActivity %>% 
